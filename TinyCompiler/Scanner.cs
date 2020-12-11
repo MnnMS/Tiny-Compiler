@@ -73,13 +73,25 @@ namespace TinyCompiler
                     continue;
 
               if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
-                {
+              {
                     while ((j + 1) < SourceCode.Length && (SourceCode[j + 1] >= 'A' && SourceCode[j + 1] <= 'z') || (SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9')) {
                         CurrentChar = SourceCode[++j];
                         CurrentLexeme += CurrentChar;
                     }
-                    FindTokenClass(CurrentLexeme);
                     i = j;
+                    FindTokenClass(CurrentLexeme);  
+              }
+
+              else if(CurrentChar == '\"')
+              {
+                    while ((j + 1) < SourceCode.Length)
+                    {
+                        CurrentChar = SourceCode[++j];
+                        CurrentLexeme += CurrentChar;
+                        if (CurrentChar == '\"') break;
+                    }
+                    i = j;
+                    FindTokenClass(CurrentLexeme);   
                 }
 
                 else if (CurrentChar >= '0' && CurrentChar <= '9')
@@ -93,44 +105,35 @@ namespace TinyCompiler
                     FindTokenClass(CurrentLexeme);
                     
                 }
-                else if(CurrentChar == '/')
+                else if(CurrentChar == '/' && (j + 1) < SourceCode.Length && SourceCode[j + 1] == '*')
                 {
-                    if ((j + 1) < SourceCode.Length && SourceCode[j+1] == '*')
+
+                    while ((j + 1) < SourceCode.Length)
                     {
-                        while ((j + 1) < SourceCode.Length && (SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9') || (SourceCode[j + 1] >= 'A' && SourceCode[j + 1] <= 'z') && SourceCode[j + 1] != '/')
-                        {
-                            CurrentChar = SourceCode[++j];
-                            CurrentLexeme += CurrentChar;
-                        }
+                         CurrentChar = SourceCode[++j];
+                         CurrentLexeme += CurrentChar;
+                         if (CurrentChar == '/') break;
                     }
-                    i = j;
-                    FindTokenClass(CurrentLexeme);
+                    if (isComment(CurrentLexeme)) continue;
+                    i = j;        
                 }
                 else
                 {
-                   if (CurrentChar == '.' || CurrentChar == ';' || CurrentChar == ',' || CurrentChar == '(' || CurrentChar == ')'
-                        || CurrentChar == '+' || CurrentChar ==  '*' || CurrentChar == '-' || CurrentChar == '/' || CurrentChar == '=')
-                    {
-                        FindTokenClass(CurrentLexeme);
-                    }
-                   else if (CurrentChar == '<')
+                   if (CurrentChar == '<')
                     {
                         if ((j + 1) < SourceCode.Length && SourceCode[j+1] == '>' || SourceCode[j + 1] == '=')
                         {
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
-                        }
-                        FindTokenClass(CurrentLexeme);
+                        }        
                     }
                    else if (CurrentChar == '>')
                     {
-
                         if ((j + 1) < SourceCode.Length && SourceCode[j + 1] == '=')
                         {
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
                         }
-                        FindTokenClass(CurrentLexeme);
                     }
                    else if (CurrentChar == ':')
                     {
@@ -139,7 +142,6 @@ namespace TinyCompiler
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
                         }
-                        FindTokenClass(CurrentLexeme);
                     }
                    else if (CurrentChar == '&')
                     {
@@ -148,7 +150,6 @@ namespace TinyCompiler
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
                         }
-                        FindTokenClass(CurrentLexeme);
                     }
                     else if (CurrentChar == '|')
                     {
@@ -157,31 +158,33 @@ namespace TinyCompiler
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
                         }
-                        FindTokenClass(CurrentLexeme);
                     }
+                    i = j;
+                    FindTokenClass(CurrentLexeme);
                 }
             }
-
                 Tiny_Compiler.TokenStream = Tokens;
             }
-        }
+
         void FindTokenClass(string Lex)
         {
-             Token_Class TC;
             Token Tok = new Token();
             Tok.lex = Lex;
-            string temp = Lex.ToUpper();
             //Is it a reserved word?
-            if (ReservedWords.ContainsKey(temp))
+            if (ReservedWords.ContainsKey(Lex))
             {
-                Tok.token_type = ReservedWords[temp];
-                
+                Tok.token_type = ReservedWords[Lex];
+            }
+
+            else if (isString(Lex))
+            {
+                Tok.token_type = Token_Class.String;
             }
 
             //Is it an identifier?
-            if (isIdentifier(Lex))
+            else if (isIdentifier(Lex))
             {
-                Tok.token_type = Token_Class.Idenifier;
+                Tok.token_type = Token_Class.Identifier;
             }
 
             //Is it a Constant?
@@ -199,13 +202,20 @@ namespace TinyCompiler
 
             Tokens.Add(Tok);
         }
-         bool isIdentifier(string lex)
+
+        bool isString(string lex)
         {
-            bool isValid=true;
-            
-            if (lex[0] >= '0' && lex[0] <= '9') return false;
-            
-            
+            bool isValid = false;
+            if (lex[0] == '\"' && lex[lex.Length - 1] == '\"') isValid =  true;
+            return isValid;
+        }
+
+        bool isIdentifier(string lex)
+        {
+            bool isValid = true;
+
+            if (!(lex[0] >= 'A' && lex[0] <= 'z')) return false;
+
             return isValid;
         }
         bool isConstant(string lex)
@@ -251,4 +261,5 @@ namespace TinyCompiler
             return isValid;
         }
     }
+        
 }
