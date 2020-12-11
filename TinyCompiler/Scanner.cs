@@ -196,6 +196,9 @@ namespace TinyCompiler
                 Tok.token_type = Operators[Lex];
             }
 
+            if (isComment() == false){
+                //error
+            }
 
             Tokens.Add(Tok);
         }
