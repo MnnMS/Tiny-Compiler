@@ -69,7 +69,7 @@ namespace TinyCompiler
                 char CurrentChar = SourceCode[i];
                 string CurrentLexeme = CurrentChar.ToString();
 
-                if (CurrentChar == ' ' || CurrentChar == '\r' || CurrentChar == '\n')
+                if (CurrentChar == ' ' || CurrentChar == '\t' || CurrentChar == '\n' || CurrentChar == '\r')
                     continue;
 
               if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
@@ -96,7 +96,7 @@ namespace TinyCompiler
 
                 else if (CurrentChar >= '0' && CurrentChar <= '9')
                 {
-                    while ((j + 1) < SourceCode.Length && SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9' || CurrentChar == '.' )
+                    while ((j + 1) < SourceCode.Length && SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9' || SourceCode[j + 1] == '.')
                     {
                         CurrentChar = SourceCode[++j];
                         CurrentLexeme += CurrentChar;
@@ -207,6 +207,7 @@ namespace TinyCompiler
             bool isValid = false;
             if (lex[0] == '\"' && lex[lex.Length - 1] == '\"') isValid =  true;
             return isValid;
+            
         }
 
         bool isIdentifier(string lex)
@@ -255,7 +256,7 @@ namespace TinyCompiler
         {
             int len = lex.Length;
             bool isValid = false;
-            if (lex[0] == '/' && lex[1] == '*' && lex[len - 1] == '*' && lex[len - 2] == '/')
+            if (lex[0] == '/' && lex[1] == '*' && lex[len - 2] == '*' && lex[len - 1] == '/')
                 return true;
             return isValid;
         }
