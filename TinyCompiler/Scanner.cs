@@ -114,8 +114,8 @@ namespace TinyCompiler
                          CurrentLexeme += CurrentChar;
                          if (CurrentChar == '/') break;
                     }
-                    if (isComment(CurrentLexeme)) continue;
-                    i = j;        
+                    i = j;
+                    if (isComment(CurrentLexeme)) continue;                       
                 }
                 else
                 {
