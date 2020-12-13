@@ -69,12 +69,12 @@ namespace TinyCompiler
                 char CurrentChar = SourceCode[i];
                 string CurrentLexeme = CurrentChar.ToString();
 
-                if (CurrentChar == ' ' || CurrentChar == '\t' || CurrentChar == '\n' || CurrentChar == '\r')
+                if (isWhiteSpace(CurrentChar))
                     continue;
 
               if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
               {
-                    while ((j + 1) < SourceCode.Length && (SourceCode[j + 1] >= 'A' && SourceCode[j + 1] <= 'z') || (SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9')) {
+                    while ((j + 1) < SourceCode.Length && ((SourceCode[j + 1] >= 'A' && SourceCode[j + 1] <= 'z') || (SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9'))) {
                         CurrentChar = SourceCode[++j];
                         CurrentLexeme += CurrentChar;
                     }
@@ -88,7 +88,7 @@ namespace TinyCompiler
                     {
                         CurrentChar = SourceCode[++j];
                         CurrentLexeme += CurrentChar;
-                        if (CurrentChar == '\"') break;
+                        if (CurrentChar == '\"' || CurrentChar == '\n') break;
                     }
                     i = j;
                     FindTokenClass(CurrentLexeme);   
@@ -96,7 +96,7 @@ namespace TinyCompiler
 
                 else if (CurrentChar >= '0' && CurrentChar <= '9')
                 {
-                    while ((j + 1) < SourceCode.Length && SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9' || SourceCode[j + 1] == '.')
+                    while ((j + 1) < SourceCode.Length && (SourceCode[j + 1] >= '0' && SourceCode[j + 1] <= '9' || SourceCode[j + 1] == '.'))
                     {
                         CurrentChar = SourceCode[++j];
                         CurrentLexeme += CurrentChar;
@@ -121,7 +121,7 @@ namespace TinyCompiler
                 {
                    if (CurrentChar == '<')
                     {
-                        if ((j + 1) < SourceCode.Length && SourceCode[j+1] == '>' || SourceCode[j + 1] == '=')
+                        if ((j + 1) < SourceCode.Length && (SourceCode[j+1] == '>' || SourceCode[j + 1] == '='))
                         {
                             CurrentChar = SourceCode[++j];
                             CurrentLexeme += CurrentChar;
@@ -188,7 +188,7 @@ namespace TinyCompiler
             else if (isIdentifier(Lex))
             {
                 unknownString = false;
-                Tok.token_type = Token_Class.Identifier;
+                Tok.token_type = Token_Class.Identifier;         
             }
 
             //Is it a Constant?
@@ -210,6 +210,15 @@ namespace TinyCompiler
             }
             else
                 Tokens.Add(Tok);
+        }
+
+        bool isWhiteSpace(char x)
+        {
+            if(x == ' ' || x == '\t' || x == '\n' || x == '\r')
+            {
+                return true;
+            }
+            return false;
         }
 
         bool isString(string lex)
