@@ -170,44 +170,59 @@ namespace TinyCompiler
         {
             Token Tok = new Token();
             Tok.lex = Lex;
+            bool unknownString = true;
             //Is it a reserved word?
             if (ReservedWords.ContainsKey(Lex))
             {
+                unknownString = false;
                 Tok.token_type = ReservedWords[Lex];
             }
 
             else if (isString(Lex))
             {
+                unknownString = false;
                 Tok.token_type = Token_Class.String;
             }
 
             //Is it an identifier?
             else if (isIdentifier(Lex))
             {
+                unknownString = false;
                 Tok.token_type = Token_Class.Identifier;
             }
 
             //Is it a Constant?
             if (isConstant(Lex))
             {
+                unknownString = false;
                 Tok.token_type = Token_Class.Number;
             }
 
             //Is it an operator?
             if (Operators.ContainsKey(Lex))
             {
+                unknownString = false;
                 Tok.token_type = Operators[Lex];
             }
-
-            Tokens.Add(Tok);
+            if (unknownString)
+            {
+                Errors.Error_List.Add(Lex + "  Unknown String");
+            }
+            else
+                Tokens.Add(Tok);
         }
 
         bool isString(string lex)
         {
             bool isValid = false;
-            if (lex[0] == '\"' && lex[lex.Length - 1] == '\"') isValid =  true;
-            return isValid;
-            
+            if (lex[0] == '\"' )
+            {
+                if (lex[lex.Length - 1] == '\"')
+                    isValid = true;              
+                else
+                    Errors.Error_List.Add(lex +"  Unclosed String");
+            }            
+            return isValid;           
         }
 
         bool isIdentifier(string lex)
@@ -220,24 +235,50 @@ namespace TinyCompiler
         }
         bool isConstant(string lex)
         {
+            int noOfDots = 0;
             bool isValid = true;
-            if (lex[0] >= 'A' && lex[0] <= 'z') return false;
+            if (lex[0] > '9' || lex[0] < '0' && lex[0]!='.') return false;
             int ind = lex.IndexOf('.');
             if (ind != -1)
             {
+                for (int i = 0; i < lex.Length; i++)
+                {
+                    if (lex[i] == '.')
+                    {
+                        noOfDots++;
+                    }
+                    if (noOfDots>1)
+                    {
+                        Errors.Error_List.Add(lex + "  Wrong Constant with multiple dots");
+                        return false;
+                    }
+                   
+                }
                 string[] arr = lex.Split('.');
-                if (arr[1].Length == 0) return false;
+                if (arr[1].Length == 0)
+                {
+                    Errors.Error_List.Add(lex + "  Wrong Constant Format");
+                    return false;
+                }
                 for (int i = 0; i < arr[0].Length; i++)
                 {
                     char CurrentChar = arr[0][i];
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
+                    {
+                        Errors.Error_List.Add(lex + "  Wrong Constant Format");
                         return false;
+                    }
+                        
                 }
                 for (int i = 0; i < arr[1].Length; i++)
                 {
                     char CurrentChar = arr[1][i];
+                  
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
+                    {
+                        Errors.Error_List.Add(lex + "  Wrong Constant Format");
                         return false;
+                    }
                 }
             }
             else
@@ -246,7 +287,10 @@ namespace TinyCompiler
                 {
                     char CurrentChar = lex[i];
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
+                    {
+                        Errors.Error_List.Add(lex + "  Wrong Constant Format");
                         return false;
+                    }
                 }
             }
             return isValid;
@@ -258,6 +302,7 @@ namespace TinyCompiler
             bool isValid = false;
             if (lex[0] == '/' && lex[1] == '*' && lex[len - 2] == '*' && lex[len - 1] == '/')
                 return true;
+            Errors.Error_List.Add(lex + "  Unclosed Comment");
             return isValid;
         }
     }

@@ -46,6 +46,8 @@ namespace TinyCompiler
 
         private void clearBtn_Click(object sender, EventArgs e)
         {
+            errorText.Text = "";
+            Errors.Error_List.Clear();
             tokenTable.Rows.Clear();
             Tiny_Compiler.TokenStream.Clear();
         }
