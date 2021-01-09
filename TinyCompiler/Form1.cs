@@ -22,6 +22,8 @@ namespace TinyCompiler
             errorText.Clear();
             string srcCode = srcCodeText.Text;
             Tiny_Compiler.Start_Compiling(srcCode);
+            Node root = Parser.Parse(Tiny_Compiler.Tiny_Scanner.Tokens);
+            treeView1.Nodes.Add(PrintParseTree(root));
             PrintTokens();
             PrintErrors();
         }
@@ -42,6 +44,30 @@ namespace TinyCompiler
                 errorText.Text += Errors.Error_List[i];
                 errorText.Text += "\r\n";
             }
+        }
+
+        public static TreeNode PrintParseTree(Node root)
+        {
+            TreeNode tree = new TreeNode("Parse Tree");
+            TreeNode treeRoot = PrintTree(root);
+            if (treeRoot != null)
+                tree.Nodes.Add(treeRoot);
+            return tree;
+        }
+        static TreeNode PrintTree(Node root)
+        {
+            if (root == null || root.Name == null)
+                return null;
+            TreeNode tree = new TreeNode(root.Name);
+            if (root.children.Count == 0)
+                return tree;
+            foreach (Node child in root.children)
+            {
+                if (child == null)
+                    continue;
+                tree.Nodes.Add(PrintTree(child));
+            }
+            return tree;
         }
 
         private void clearBtn_Click(object sender, EventArgs e)

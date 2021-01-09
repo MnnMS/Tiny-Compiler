@@ -36,6 +36,9 @@
             this.clearBtn = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.errorText = new System.Windows.Forms.TextBox();
+            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.parserErrorText = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tokenTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,7 +48,7 @@
             this.srcCodeText.Margin = new System.Windows.Forms.Padding(2);
             this.srcCodeText.Multiline = true;
             this.srcCodeText.Name = "srcCodeText";
-            this.srcCodeText.Size = new System.Drawing.Size(314, 373);
+            this.srcCodeText.Size = new System.Drawing.Size(263, 373);
             this.srcCodeText.TabIndex = 1;
             // 
             // compileBtn
@@ -65,7 +68,7 @@
             this.tokenTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1,
             this.Column2});
-            this.tokenTable.Location = new System.Drawing.Point(338, 11);
+            this.tokenTable.Location = new System.Drawing.Point(278, 9);
             this.tokenTable.Margin = new System.Windows.Forms.Padding(2);
             this.tokenTable.Name = "tokenTable";
             this.tokenTable.RowTemplate.Height = 24;
@@ -96,7 +99,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(591, 9);
+            this.label2.Location = new System.Drawing.Point(531, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(66, 15);
             this.label2.TabIndex = 8;
@@ -104,19 +107,47 @@
             // 
             // errorText
             // 
-            this.errorText.Location = new System.Drawing.Point(590, 28);
+            this.errorText.Location = new System.Drawing.Point(530, 26);
             this.errorText.Margin = new System.Windows.Forms.Padding(2);
             this.errorText.Multiline = true;
             this.errorText.Name = "errorText";
-            this.errorText.Size = new System.Drawing.Size(249, 356);
+            this.errorText.Size = new System.Drawing.Size(183, 356);
             this.errorText.TabIndex = 9;
+            // 
+            // treeView1
+            // 
+            this.treeView1.Location = new System.Drawing.Point(718, 12);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.Size = new System.Drawing.Size(258, 427);
+            this.treeView1.TabIndex = 10;
+            // 
+            // parserErrorText
+            // 
+            this.parserErrorText.Location = new System.Drawing.Point(982, 26);
+            this.parserErrorText.Multiline = true;
+            this.parserErrorText.Name = "parserErrorText";
+            this.parserErrorText.Size = new System.Drawing.Size(185, 358);
+            this.parserErrorText.TabIndex = 11;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(982, 8);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(66, 15);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Error List";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(855, 466);
+            this.ClientSize = new System.Drawing.Size(1184, 466);
+            this.Controls.Add(this.parserErrorText);
+            this.Controls.Add(this.treeView1);
             this.Controls.Add(this.errorText);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.clearBtn);
             this.Controls.Add(this.tokenTable);
@@ -140,6 +171,9 @@
         private System.Windows.Forms.Button clearBtn;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox errorText;
+        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TextBox parserErrorText;
+        private System.Windows.Forms.Label label1;
     }
 }
 
