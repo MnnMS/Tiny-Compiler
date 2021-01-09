@@ -24,7 +24,7 @@ namespace TinyCompiler
         public List<Token> Tokens = new List<Token>();
         Dictionary<string, Token_Class> ReservedWords = new Dictionary<string, Token_Class>();
         Dictionary<string, Token_Class> Operators = new Dictionary<string, Token_Class>();
-
+        bool unknownString = true;
         public Scanner()
         {
             ReservedWords.Add("if", Token_Class.If);
@@ -115,7 +115,8 @@ namespace TinyCompiler
                          if (CurrentChar == '/') break;
                     }
                     i = j;
-                    if (isComment(CurrentLexeme)) continue;                       
+                    if (isComment(CurrentLexeme)) continue;
+
                 }
                 else
                 {
@@ -170,7 +171,7 @@ namespace TinyCompiler
         {
             Token Tok = new Token();
             Tok.lex = Lex;
-            bool unknownString = true;
+            unknownString = true;
             //Is it a reserved word?
             if (ReservedWords.ContainsKey(Lex))
             {
@@ -192,18 +193,22 @@ namespace TinyCompiler
             }
 
             //Is it a Constant?
-            if (isConstant(Lex))
+            else if (isConstant(Lex))
             {
                 unknownString = false;
                 Tok.token_type = Token_Class.Number;
             }
 
             //Is it an operator?
-            if (Operators.ContainsKey(Lex))
+            else if (Operators.ContainsKey(Lex))
             {
                 unknownString = false;
                 Tok.token_type = Operators[Lex];
             }
+            //else if (isComment(Lex))
+            //{
+            //    unknownString = false;
+            //}
             if (unknownString)
             {
                 Errors.Error_List.Add(Lex + "  Unknown String");
@@ -229,7 +234,11 @@ namespace TinyCompiler
                 if (lex[lex.Length - 1] == '\"')
                     isValid = true;              
                 else
-                    Errors.Error_List.Add(lex +"  Unclosed String");
+                {
+                    Errors.Error_List.Add(lex + "  Unclosed String");
+                    unknownString = false;
+                }
+                    
             }            
             return isValid;           
         }
@@ -259,6 +268,7 @@ namespace TinyCompiler
                     if (noOfDots>1)
                     {
                         Errors.Error_List.Add(lex + "  Wrong Constant with multiple dots");
+                        unknownString = false;
                         return false;
                     }
                    
@@ -267,6 +277,7 @@ namespace TinyCompiler
                 if (arr[1].Length == 0)
                 {
                     Errors.Error_List.Add(lex + "  Wrong Constant Format");
+                    unknownString = false;
                     return false;
                 }
                 for (int i = 0; i < arr[0].Length; i++)
@@ -275,6 +286,7 @@ namespace TinyCompiler
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
                     {
                         Errors.Error_List.Add(lex + "  Wrong Constant Format");
+                        unknownString = false;
                         return false;
                     }
                         
@@ -286,6 +298,7 @@ namespace TinyCompiler
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
                     {
                         Errors.Error_List.Add(lex + "  Wrong Constant Format");
+                        unknownString = false;
                         return false;
                     }
                 }
@@ -298,6 +311,7 @@ namespace TinyCompiler
                     if (!(CurrentChar >= '0' && CurrentChar <= '9'))
                     {
                         Errors.Error_List.Add(lex + "  Wrong Constant Format");
+                        unknownString = false;
                         return false;
                     }
                 }
