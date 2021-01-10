@@ -155,6 +155,7 @@
             this.Controls.Add(this.srcCodeText);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.tokenTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

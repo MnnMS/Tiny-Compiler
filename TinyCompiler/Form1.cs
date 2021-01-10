@@ -77,5 +77,10 @@ namespace TinyCompiler
             tokenTable.Rows.Clear();
             Tiny_Compiler.TokenStream.Clear();
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
