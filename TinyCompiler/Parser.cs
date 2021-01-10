@@ -29,17 +29,40 @@ namespace TinyCompiler
 
             return root;
         }
-       
+       bool check(Token_Class tc)
+        {
+            if (TokenStream[tokenIndex].token_type == tc)
+                return true;
+
+            return false;
+        }
+
+        
         public Node match(Token_Class ExpectedToken)
         {
-
-
+            Token token = TokenStream[tokenIndex];
+            if (token.token_type == ExpectedToken)
+            {
+                tokenIndex++;
+                Node node = new Node(token.lex);
+                return node;
+            }
+            else
+            {
+                Errors.Error_List.Add("Expected to find "
+                        + ExpectedToken.ToString() + " and" +
+                        token.token_type.ToString() +
+                        " found\r\n"
+                        + " at " + tokenIndex.ToString() + "\n");
+                tokenIndex++;
+            }
 
             return null;
         }
 
         Node FunctionCall()
         {
+            // FuncitonCall -> Identifier FunctionParameter
             Node FC = new Node("FunctionCall");
 
             FC.children.Add(match(Token_Class.Identifier));
@@ -51,6 +74,7 @@ namespace TinyCompiler
 
         private Node FunctionParameter()
         {
+            // FunctionParameter -> ( Parameter )
             Node FP = new Node("FunctionParameter");
 
             FP.children.Add(match(Token_Class.LParanthesis));
@@ -62,8 +86,10 @@ namespace TinyCompiler
 
         private Node Parameter()
         {
+            // Parameter -> Identifier MoreParameter | E
+
             Node par = new Node("Parameter");
-            if (TokenStream[tokenIndex].token_type == Token_Class.Identifier)
+            if (check(Token_Class.Identifier))
             {
                 par.children.Add(match(Token_Class.Identifier));
                 par.children.Add(MoreParameter());
@@ -77,9 +103,10 @@ namespace TinyCompiler
 
         private Node MoreParameter()
         {
+            // MoreParameter -> , Identifier MoreParameter | E
             Node MP = new Node("MoreParameter");
 
-            if (TokenStream[tokenIndex].token_type == Token_Class.Comma)
+            if (check(Token_Class.Comma))
             {
                 MP.children.Add(match(Token_Class.Comma));
                 MP.children.Add(match(Token_Class.Identifier));
@@ -100,14 +127,14 @@ namespace TinyCompiler
 
             Node term = new Node("Term");
 
-            if (TokenStream[tokenIndex].token_type == Token_Class.Number)
+            if (check(Token_Class.Number))
             {
                 term.children.Add(match(Token_Class.Number));
             }
-            else if (TokenStream[tokenIndex].token_type == Token_Class.Identifier)
+            else if (check(Token_Class.Identifier))
             {
                 term.children.Add(match(Token_Class.Identifier));
-                if (TokenStream[tokenIndex].token_type == Token_Class.LParanthesis)
+                if (check(Token_Class.LParanthesis))
                 {
                     term.children.Add(FunctionParameter());
                 }
@@ -115,11 +142,48 @@ namespace TinyCompiler
             else 
             {
                 //Error
+                Errors.Error_List.Add("Expected to find " +
+                    "Number or Identifier or FunctionCall "+
+                    "and " + TokenStream[tokenIndex].lex.ToString() +
+                    " found\r\n" + " at " + tokenIndex.ToString() + "\n");
                 return null;
             }
 
             return term;
         }
+
+        Node ArithamaticOperator()
+        {
+            // ArithOp -> * | / | + | -
+
+            Node Aop = new Node("ArithmaticOperator");
+            if (check(Token_Class.MultiplyOp))
+            {
+                Aop.children.Add(match(Token_Class.MultiplyOp));
+            }
+            else if (check(Token_Class.DivideOp))
+            {
+                Aop.children.Add(match(Token_Class.DivideOp));
+            }
+            else if (check(Token_Class.PlusOp))
+            {
+                Aop.children.Add(match(Token_Class.PlusOp));
+            }
+            else if (check(Token_Class.PlusOp))
+            {
+                Aop.children.Add(match(Token_Class.PlusOp));
+            }
+            else
+            {
+                //Error
+                Errors.Error_List.Add("Expected to find " +
+                    "Arthimatic Operator "+ "and " +
+                    TokenStream[tokenIndex].token_type + "Found ");
+            }
+
+            return Aop;
+        }
+        
     }
 
 }
