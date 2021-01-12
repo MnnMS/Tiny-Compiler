@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public enum Token_Class
 {
-    ElseIf, End, Else, If, INT, Read, Then, Until, Write,
+    ElseIf, End, Else, If, INT, Read, Then, Until, Write, main,
     Semicolon, LParanthesis, RParanthesis, LBraces, RBraces, Assignment, LessThanOp,
     GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp,
     Identifier, Number, Comma, Repeat, BooleanEqual, String, EndLine, Return, Float
@@ -41,6 +41,7 @@ namespace TinyCompiler
             ReservedWords.Add("write", Token_Class.Write);
             ReservedWords.Add("repeat", Token_Class.Repeat);
             ReservedWords.Add("return", Token_Class.Return);
+            ReservedWords.Add("main", Token_Class.main);
 
             Operators.Add(";", Token_Class.Semicolon);
             Operators.Add(",", Token_Class.Comma);

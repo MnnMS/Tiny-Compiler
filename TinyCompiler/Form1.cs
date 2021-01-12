@@ -26,6 +26,7 @@ namespace TinyCompiler
             Tiny_Compiler.Start_Compiling(srcCode);
             Node root = parser.Parse(Tiny_Compiler.Tiny_Scanner.Tokens);
             treeView1.Nodes.Add(PrintParseTree(root));
+
             PrintTokens();
             PrintErrors();
         }

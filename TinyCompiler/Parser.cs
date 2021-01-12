@@ -75,7 +75,7 @@ namespace TinyCompiler
             Node prog = new Node("Program");
 
             prog.children.Add(Functions());
-            prog.children.Add(mainFunction());
+           // prog.children.Add(mainFunction());
 
             return prog;
         }
@@ -112,7 +112,7 @@ namespace TinyCompiler
                 return Functions;
             }
 
-            return null;
+            
 
         }
 
@@ -148,14 +148,25 @@ namespace TinyCompiler
 
         private Node FunctionDecleration()
         {
-            //FunctionDecleration -> FunctionName ( Parameter )
+            //FunctionDecleration -> DataType FunctionName FunctionParameter
             Node FunDec = new Node("FunctionDecleration");
 
+            FunDec.children.Add(DataType());
+            if (check(Token_Class.main))
+            {
+                mainFuncExist = true;
+                FunDec.children.Add(match(Token_Class.main));
+            }
+            else
+            {
                 FunDec.children.Add(match(Token_Class.Identifier));
-                FunDec.children.Add(Parameter());
+            }
+            
+            FunDec.children.Add(FunctionParameter());
 
-                return FunDec;
-           
+            return FunDec;
+
+
         }
 
         private Node FunctionBody()
@@ -218,16 +229,22 @@ namespace TinyCompiler
             List<String> errorTemp = Errors.Error_List;
             int tempIndex = tokenIndex;
             Node TempRet = ReturnStatements();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node Tempif = if_Statement();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node TempRep = RepeatStatement();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node TempAss = AssignmentStatment();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node TempDec = DeclarStat();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node TempRead = Write();
+            Errors.Error_List = errorTemp;
             tokenIndex = tempIndex;
             Node Tempwrite = Read();
             if (TempRet != null)
@@ -600,6 +617,7 @@ namespace TinyCompiler
                 eq.children.Add(Term());
                 eq.children.Add(Equation_());
                 eq.children.Add(match(Token_Class.RParanthesis));
+                eq.children.Add(Term_());
                 return eq;
             }
             eq.children.Add(Term());
@@ -614,7 +632,7 @@ namespace TinyCompiler
             Node eq = new Node("Equation_");
 
             eq.children.Add(ArithamaticOperator());
-            eq.children.Add(Factor());
+            eq.children.Add(Term());
             eq.children.Add(Term_());
 
             return eq;
@@ -641,38 +659,38 @@ namespace TinyCompiler
             return term;
         }
 
-        private Node Factor()
-        {
-            Node factor = new Node("Factor");
-            Node temp;
-            int indexTemp = tokenIndex;
-            List<String> errorTemp = Errors.Error_List;
-            temp = Equation();
-            if (temp != null)
-            {
-                factor.children.Add(temp);
-            }
-            else
-            {
-                tokenIndex = indexTemp;
-                Errors.Error_List = errorTemp;
-                temp = Term();
-                if (temp != null)
-                {
-                    factor.children.Add(temp);                   
-                }
-                else
-                {
-                    //Error
-                    tokenIndex = indexTemp;
-                    Errors.Error_List = errorTemp;
-                    Errors.Error_List.Add("Expected Equation or Term but " +
-                        TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
-                    return null;
-                }
-            }         
-            return factor;
-        }
+        //private Node Factor()
+        //{
+        //    Node factor = new Node("Factor");
+        //    Node temp;
+        //    int indexTemp = tokenIndex;
+        //    List<String> errorTemp = Errors.Error_List;
+        //    temp = Equation();
+        //    if (temp != null)
+        //    {
+        //        factor.children.Add(temp);
+        //    }
+        //    else
+        //    {
+        //        tokenIndex = indexTemp;
+        //        Errors.Error_List = errorTemp;
+        //        temp = Term();
+        //        if (temp != null)
+        //        {
+        //            factor.children.Add(temp);                   
+        //        }
+        //        else
+        //        {
+        //            //Error
+        //            tokenIndex = indexTemp;
+        //            Errors.Error_List = errorTemp;
+        //            Errors.Error_List.Add("Expected Equation or Term but " +
+        //                TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+        //            return null;
+        //        }
+        //    }         
+        //    return factor;
+        //}
 
         Node Expression()
         {
@@ -689,7 +707,8 @@ namespace TinyCompiler
             else
             {
                 errorTemp = Errors.Error_List;
-                temp = Factor();
+                temp = Term();
+               
                 if (temp != null)
                 {
                     exp.children.Add(temp);
@@ -698,9 +717,20 @@ namespace TinyCompiler
                 {
                     tokenIndex = indexTemp;
                     Errors.Error_List = errorTemp;
-                    Errors.Error_List.Add("Expexted to find Expression but " +
-                        TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
-                    return null;
+                    temp = Expression();
+                    if (temp != null)
+                    {
+                        exp.children.Add(temp);
+                    }
+                    else
+                    {
+                        tokenIndex = indexTemp;
+                        Errors.Error_List = errorTemp;
+                        Errors.Error_List.Add("Expexted to find Expression but " +
+                       TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+                        return null;
+                    }
+                   
                 }
             }
             
