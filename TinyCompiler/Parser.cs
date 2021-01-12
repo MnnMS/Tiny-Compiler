@@ -274,6 +274,15 @@ namespace TinyCompiler
             {
                 statment.children.Add(DeclarStat());
             }
+
+            else if (check(Token_Class.ElseIf))
+            {
+                statment.children.Add(ElseIf());
+            }
+            else if (check(Token_Class.Else))
+            {
+                statment.children.Add(Else());
+            }
             else
                 return null;
 
