@@ -224,67 +224,46 @@ namespace TinyCompiler
 
         private Node Statement()
         {
-            //Statement -> Comment | Assignment | Decleration | WriteStatement | ReadStatement | ReturnStatement | if_Statement | RepeatStatement | E
+            //Statement -> Assignment | Decleration | WriteStatement | ReadStatement | ReturnStatement | if_Statement | RepeatStatement | E
             Node statment = new Node("Statement");
-            List<String> errorTemp = Errors.Error_List;
-            int tempIndex = tokenIndex;
-            Node TempRet = ReturnStatements();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node Tempif = if_Statement();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node TempRep = RepeatStatement();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node TempAss = AssignmentStatment();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node TempDec = DeclarStat();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node TempRead = Write();
-            Errors.Error_List = errorTemp;
-            tokenIndex = tempIndex;
-            Node Tempwrite = Read();
-            if (TempRet != null)
+
+            if (check(Token_Class.Return))
             {
-                statment.children.Add(TempRet);
+                statment.children.Add(match(Token_Class.Return));
             }
-            else if (Tempif != null)
-            {                  
-                statment.children.Add(Tempif);
-            }
-            else if(TempRep!= null)
-            {                
-                statment.children.Add(TempRep);
-            }
-            else if (TempAss != null)
+
+            else if (check(Token_Class.Repeat))
             {
-                statment.children.Add(TempAss);
+                statment.children.Add(match(Token_Class.Repeat));
             }
-            else if (TempDec != null)
+
+            else if (check(Token_Class.Identifier))
             {
-                statment.children.Add(TempDec);
+                statment.children.Add(match(Token_Class.Identifier));
             }
-            else if (Tempwrite != null)
+
+            else if (check(Token_Class.Write))
             {
-                statment.children.Add(Tempwrite);
+                statment.children.Add(match(Token_Class.Write));
             }
-            else if (TempRead != null)
+
+            else if (check(Token_Class.Read))
             {
-                statment.children.Add(TempRead);
+                statment.children.Add(match(Token_Class.Read));
+            }
+
+            else if (check(Token_Class.If))
+            {
+                statment.children.Add(match(Token_Class.If));
+            }
+
+            else if (check(Token_Class.INT) || check(Token_Class.Float) || check(Token_Class.String))
+            {
+                statment.children.Add(DataType());
             }
             else
-            {
-                Errors.Error_List = errorTemp;
-                tokenIndex = tempIndex;
-
-                Errors.Error_List.Add("Expected to find Statement but " + 
-                    TokenStream[tokenIndex].token_type + "Found at" + tokenIndex); 
                 return null;
-            }
-            Errors.Error_List = errorTemp;
+
             return statment;
             
 
