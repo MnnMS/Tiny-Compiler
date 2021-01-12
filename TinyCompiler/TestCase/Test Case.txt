@@ -1,0 +1,10 @@
+int main()
+{
+float z1 := 3*(2+1)-5.5;
+if  z1 > 5 then
+    write z1;
+else
+    z1 := val;
+end
+return 0;
+}

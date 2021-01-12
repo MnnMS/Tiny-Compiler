@@ -1,0 +1,7 @@
+missing )
+expected identifier found int
+no retrun in fun function
+no left curly braces in main function
+semicolon after if condition instead of then
+no semicolon in write "write z1"
+:= instead of = in "float z=val;"
