@@ -66,12 +66,12 @@ namespace TinyCompiler
             }
             else
             {
-                //Errors.Error_List.Add("Expected to find "
-                //        + ExpectedToken.ToString() + " and" +
-                //        token.token_type.ToString() +
-                //        " found\r\n"
-                //        + " at " + tokenIndex.ToString() + "\n");
-                tokenIndex++;
+                Errors.Error_List.Add("Expected to find "
+                        + ExpectedToken.ToString() + " and " +
+                        token.token_type.ToString() +
+                        " found\r\n"
+                        + " at " + tokenIndex.ToString() + "\n");
+                //tokenIndex++;
             }
 
             return null;
@@ -240,19 +240,19 @@ namespace TinyCompiler
             //Statement -> Assignment | Decleration | WriteStatement | ReadStatement | ReturnStatement | if_Statement | RepeatStatement | E
             Node statment = new Node("Statement");
 
-            if (check(Token_Class.Return))
-            {
-                statment.children.Add(ReturnStatements());
-            }
+            //if (check(Token_Class.Return))
+            //{
+            //    statment.children.Add(ReturnStatements());
+            //}
 
-            else if (check(Token_Class.Repeat))
+            if (check(Token_Class.Repeat))
             {
                 statment.children.Add(RepeatStatement());
             }
 
             else if (check(Token_Class.Identifier))
             {
-                statment.children.Add(AssignmentStatment());
+                statment.children.Add(AssignmentWithSemi());
             }
 
             else if (check(Token_Class.Write))
@@ -402,8 +402,8 @@ namespace TinyCompiler
                 ifStat.children.Add(ConditionStatement());
                 ifStat.children.Add(match(Token_Class.Then));
                 ifStat.children.Add(Statements());
-                ifStat.children.Add(ElseClause());
-
+            //ifStat.children.Add(ElseClause());
+            ifStat.children.Add(match(Token_Class.End));
                 return ifStat;
         }
 
@@ -417,7 +417,7 @@ namespace TinyCompiler
             if (temp != null)
             {
                 ElseC.children.Add(temp);
-                ElseC.children.Add(match(Token_Class.End));
+                
             }
             else
             {
@@ -463,7 +463,7 @@ namespace TinyCompiler
 
                 e.children.Add(match(Token_Class.Else));
                 e.children.Add(Statements());
-                e.children.Add(match(Token_Class.End));
+               
  
             return e;
         }
@@ -778,6 +778,13 @@ namespace TinyCompiler
 
             return node;
         }
+        Node AssignmentWithSemi()
+        {
+            Node node = AssignmentStatment();
+            node.children.Add(match(Token_Class.Semicolon));
+            return node;
+        }
+
         Node DataType()
         {
             // DataType -> int | float | string
@@ -818,6 +825,7 @@ namespace TinyCompiler
             return node;
         }
 
+        
         private Node Declaration_()
         {
             // Declaration_ -> := Expression MoreDeclare | MoreDeclare

@@ -37,8 +37,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.errorText = new System.Windows.Forms.TextBox();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.parserErrorText = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tokenTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -118,36 +116,16 @@
             // 
             this.treeView1.Location = new System.Drawing.Point(718, 12);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(258, 427);
+            this.treeView1.Size = new System.Drawing.Size(454, 427);
             this.treeView1.TabIndex = 10;
-            // 
-            // parserErrorText
-            // 
-            this.parserErrorText.Location = new System.Drawing.Point(982, 26);
-            this.parserErrorText.Multiline = true;
-            this.parserErrorText.Name = "parserErrorText";
-            this.parserErrorText.Size = new System.Drawing.Size(185, 358);
-            this.parserErrorText.TabIndex = 11;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(982, 8);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(66, 15);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Error List";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1184, 466);
-            this.Controls.Add(this.parserErrorText);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.errorText);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.clearBtn);
             this.Controls.Add(this.tokenTable);
@@ -173,8 +151,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox errorText;
         private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.TextBox parserErrorText;
-        private System.Windows.Forms.Label label1;
     }
 }
 
