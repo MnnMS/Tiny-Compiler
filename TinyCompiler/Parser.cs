@@ -26,12 +26,15 @@ namespace TinyCompiler
         int tokenIndex = 0;
         static List<Token> TokenStream;
         public static Node root;
-        public static Node Parse(List<Token> Tokens)
+        static bool mainFuncExist = false;
+        public Node Parse(List<Token> Tokens)
         {
             TokenStream = Tokens;
-           
+            root = new Node("Root");
+            root.children.Add(program());
 
-            //write your parser code
+            if (!mainFuncExist)
+                Errors.Error_List.Add("Your code doesn't contain a main()\n");
 
             return root;
         }
@@ -66,7 +69,7 @@ namespace TinyCompiler
             return null;
         }
 
-        Node Program()
+        private Node program()
         {
             //Program -> Functions mainFunction
             Node prog = new Node("Program");
@@ -81,7 +84,7 @@ namespace TinyCompiler
         {
             //mainFunction -> Datatype Identifier
             Node main = new Node("mainFunction");
-
+            mainFuncExist = true;
             main.children.Add(DataType());
             main.children.Add(match(Token_Class.Identifier));
 

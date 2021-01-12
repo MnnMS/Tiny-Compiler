@@ -12,9 +12,11 @@ namespace TinyCompiler
 {
     public partial class Form1 : Form
     {
+        Parser parser = new Parser();
         public Form1()
         {
             InitializeComponent();
+            
         }
 
         private void compileBtn_Click(object sender, EventArgs e)
@@ -22,7 +24,7 @@ namespace TinyCompiler
             errorText.Clear();
             string srcCode = srcCodeText.Text;
             Tiny_Compiler.Start_Compiling(srcCode);
-            Node root = Parser.Parse(Tiny_Compiler.Tiny_Scanner.Tokens);
+            Node root = parser.Parse(Tiny_Compiler.Tiny_Scanner.Tokens);
             treeView1.Nodes.Add(PrintParseTree(root));
             PrintTokens();
             PrintErrors();
