@@ -613,23 +613,25 @@ namespace TinyCompiler
                 return eq;
             }
             Node temp;
+            Node temp2;
             int indexTemp = tokenIndex;
             List<String> errorTemp = Errors.Error_List;
             temp = Term();
             if (temp != null)
             {
                 
-                temp = Equation_();
-                tokenIndex = indexTemp;
-                Errors.Error_List = errorTemp;
-                if (temp == null)
+                temp2 = Equation_();
+               
+                if (temp2 == null)
                 {
+                    tokenIndex = indexTemp;
+                    Errors.Error_List = errorTemp;
                     return null;
                 }
                 else
                 {
-                    eq.children.Add(Term());
                     eq.children.Add(temp);
+                    eq.children.Add(temp2);
                 }
             }
            
@@ -669,7 +671,7 @@ namespace TinyCompiler
             }
             else
             {
-                term.children.Add(ArithamaticOperator());
+                term.children.Add(temp);
                 term.children.Add(Term());
                 term.children.Add(Term_());
             }
