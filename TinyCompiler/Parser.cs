@@ -94,7 +94,10 @@ namespace TinyCompiler
                 par.children.Add(match(Token_Class.Identifier));
                 par.children.Add(MoreParameter());
             }
-           
+            else
+            {
+                return null;
+            }
             return par;
         }
 
@@ -109,6 +112,10 @@ namespace TinyCompiler
                 MP.children.Add(match(Token_Class.Identifier));
                 MP.children.Add(MoreParameter());
                 
+            }
+            else
+            {
+                return null;
             }
             return MP;
 
@@ -194,31 +201,7 @@ namespace TinyCompiler
             eq.children.Add(Term());
             eq.children.Add(Equation_());
             return eq;
-            //temp = Term();
-            //if (temp == null)
-            //{
-            //    tokenIndex = indexTemp;
-            //    return null;
-            //}
-            //else
-            //{
-            //    eq.children.Add(temp);
-            //}
-            //indexTemp = tokenIndex;
-            //temp = Equation_();
-            //if (temp == null)
-            //{
-            //    tokenIndex = indexTemp;
-            //    return null;
-            //}
-            //else
-            //{
-            //    eq.children.Add(temp);
-            //}
-
-
-
-
+            
         }
 
         private Node Equation_()
@@ -257,10 +240,210 @@ namespace TinyCompiler
         private Node Factor()
         {
             Node factor = new Node("Factor");
-
-
-
+            Node temp;
+            int indexTemp = tokenIndex;
+            List<String> errorTemp = Errors.Error_List;
+            temp = Equation();
+            if (temp != null)
+            {
+                factor.children.Add(temp);
+            }
+            else
+            {
+                tokenIndex = indexTemp;
+                Errors.Error_List = errorTemp;
+                temp = Term();
+                if (temp != null)
+                {
+                    factor.children.Add(temp);                   
+                }
+                else
+                {
+                    //Error
+                    tokenIndex = indexTemp;
+                    Errors.Error_List = errorTemp;
+                    Errors.Error_List.Add("Expected Equation or Term but " +
+                        TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+                    return null;
+                }
+            }         
             return factor;
+        }
+
+        Node Expression()
+        {
+            //Expression -> string | Term | Equation
+            Node exp = new Node("Expression");
+            int indexTemp = tokenIndex;
+            Node temp;
+            List<String> errorTemp;
+
+            if (check(Token_Class.String))
+            {
+                exp.children.Add(match(Token_Class.String));
+            }
+            else
+            {
+                errorTemp = Errors.Error_List;
+                temp = Factor();
+                if (temp != null)
+                {
+                    exp.children.Add(temp);
+                }
+                else
+                {
+                    tokenIndex = indexTemp;
+                    Errors.Error_List = errorTemp;
+                    Errors.Error_List.Add("Expexted to find Expression but " +
+                        TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+                    return null;
+                }
+            }
+            
+
+            return exp;
+        }
+        Node AssignmentStatment()
+        {
+            //AssignmentStatment -> Identifier := Expresison
+            Node node = new Node("AssignmentStatment");
+
+            node.children.Add(match(Token_Class.Identifier));
+            node.children.Add(match(Token_Class.Assignment));
+            node.children.Add(Expression());
+
+            return node;
+        }
+        Node DataType()
+        {
+            // DataType -> int | float | string
+
+            Node data = new Node("DataType");
+
+            if (check(Token_Class.INT))
+            {
+                data.children.Add(match(Token_Class.INT));
+            }
+            else if (check(Token_Class.Float))
+            {
+                data.children.Add(match(Token_Class.Float));
+            }
+            else if (check(Token_Class.String))
+            {
+                data.children.Add(match(Token_Class.String));
+            }
+            else
+            {
+                Errors.Error_List.Add("Expected to find DataType but " +
+                    TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+                return null;
+            }
+            return data;
+        }
+
+        Node DeclarStat()
+        {
+            //DeclarationStatement -> DataType Identifier Declaration_
+            Node node = new Node("DeclarationStatement");
+
+            node.children.Add(DataType());
+            node.children.Add(match(Token_Class.Identifier));
+            node.children.Add(Declaration_());
+            node.children.Add(match(Token_Class.Semicolon));
+
+            return node;
+        }
+
+        private Node Declaration_()
+        {
+            // Declaration_ -> := Expression MoreDeclare | MoreDeclare
+            Node node = new Node("Declaration_");
+
+            if (check(Token_Class.Assignment))
+            {
+                node.children.Add(match(Token_Class.Assignment));
+                node.children.Add(Expression());
+                
+            }
+            node.children.Add(MoreDeclare());
+
+            return node;
+        }
+
+        private Node MoreDeclare()
+        {
+            // MoreDeclare -> ,Identifier Declaration_ | E
+
+            Node more = new Node("MoreDeclaration");
+            if (check(Token_Class.Comma))
+            {
+                more.children.Add(match(Token_Class.Comma));
+                more.children.Add(match(Token_Class.Identifier));
+                more.children.Add(Declaration_());
+            }
+            else
+            {
+                return null;
+            }
+            return more;
+        }
+
+        Node Write()
+        {
+            // Write -> write Write_ ;
+
+            Node write = new Node("Write");
+
+            write.children.Add(match(Token_Class.Write));
+            write.children.Add(Write_());
+            write.children.Add(match(Token_Class.Semicolon));
+
+            return write;
+        }
+
+        private Node Write_()
+        {
+            // Write_ -> Expression | endl
+
+            Node write = new Node("Write_");
+
+            if (check(Token_Class.EndLine))
+            {
+                write.children.Add(match(Token_Class.EndLine));
+            }
+            else 
+            {
+                int indexTemp = tokenIndex;
+                List<String> errorTemp = Errors.Error_List;
+                Node temp = Expression();
+                if (temp != null)
+                {
+                    write.children.Add(temp);
+                }
+                else
+                {
+                    tokenIndex = indexTemp;
+                    Errors.Error_List = errorTemp;
+                    Errors.Error_List.Add("Expected To find Expression or Endl but " +
+                        TokenStream[tokenIndex].token_type + "Found at " + tokenIndex);
+                    return null;
+                }
+            }
+
+            return write;
+        }
+
+        Node Read()
+        {
+            // Write -> Read Identifier ;
+
+            Node Read = new Node("Read");
+
+            Read.children.Add(match(Token_Class.Read));
+            Read.children.Add(match(Token_Class.Identifier));
+            Read.children.Add(match(Token_Class.Semicolon));
+
+            return Read;
         }
     }
 
