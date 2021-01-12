@@ -82,7 +82,7 @@ namespace TinyCompiler
             //mainFunction -> Datatype Identifier
             Node main = new Node("mainFunction");
 
-            main.children.Add(match(Datatype()));
+            main.children.Add(DataType());
             main.children.Add(match(Token_Class.Identifier));
 
             return main;
@@ -231,33 +231,61 @@ namespace TinyCompiler
         private Node Statement()
         {
             //Statement -> Comment | Assignment | Decleration | WriteStatement | ReadStatement | ReturnStatement | if_Statement | RepeatStatement | E
-            Node Statment = new Node("Statement");
+            Node statment = new Node("Statement");
+            List<String> errorTemp = Errors.Error_List;
             int tempIndex = tokenIndex;
             Node TempRet = ReturnStatements();
+            tokenIndex = tempIndex;
             Node Tempif = if_Statement();
+            tokenIndex = tempIndex;
             Node TempRep = RepeatStatement();
-
+            tokenIndex = tempIndex;
+            Node TempAss = AssignmentStatment();
+            tokenIndex = tempIndex;
+            Node TempDec = DeclarStat();
+            tokenIndex = tempIndex;
+            Node TempRead = Write();
+            tokenIndex = tempIndex;
+            Node Tempwrite = Read();
             if (TempRet != null)
             {
-                tokenIndex = tempIndex;
-                Statment.children.Add(ReturnStatements());
+                statment.children.Add(TempRet);
             }
             else if (Tempif != null)
-            {
-                    tokenIndex = tempIndex;
-                    Statment.children.Add(if_Statement());
+            {                  
+                statment.children.Add(Tempif);
             }
             else if(TempRep!= null)
+            {                
+                statment.children.Add(TempRep);
+            }
+            else if (TempAss != null)
             {
-                tokenIndex = tempIndex;
-                Statment.children.Add(RepeatStatement());
+                statment.children.Add(TempAss);
+            }
+            else if (TempDec != null)
+            {
+                statment.children.Add(TempDec);
+            }
+            else if (Tempwrite != null)
+            {
+                statment.children.Add(Tempwrite);
+            }
+            else if (TempRead != null)
+            {
+                statment.children.Add(TempRead);
             }
             else
             {
+                Errors.Error_List = errorTemp;
+                tokenIndex = tempIndex;
+
+                Errors.Error_List.Add("Expected to find Statement but " + 
+                    TokenStream[tokenIndex].token_type + "Found at" + tokenIndex); 
                 return null;
             }
-
-            return Statment;
+            Errors.Error_List = errorTemp;
+            return statment;
             
 
         }
