@@ -94,10 +94,7 @@ namespace TinyCompiler
                 par.children.Add(match(Token_Class.Identifier));
                 par.children.Add(MoreParameter());
             }
-            else
-            {
-                return null;
-            }
+           
             return par;
         }
 
@@ -111,12 +108,9 @@ namespace TinyCompiler
                 MP.children.Add(match(Token_Class.Comma));
                 MP.children.Add(match(Token_Class.Identifier));
                 MP.children.Add(MoreParameter());
-                return MP;
+                
             }
-            else
-            {
-                return null;
-            }
+            return MP;
 
         }
 
@@ -142,10 +136,9 @@ namespace TinyCompiler
             else 
             {
                 //Error
-                Errors.Error_List.Add("Expected to find " +
-                    "Number or Identifier or FunctionCall "+
-                    "and " + TokenStream[tokenIndex].lex.ToString() +
-                    " found\r\n" + " at " + tokenIndex.ToString() + "\n");
+                Errors.Error_List.Add("Expected to find Term and " +
+                         TokenStream[tokenIndex].lex.ToString() +
+                        " found\r\n" + " at " + tokenIndex.ToString() + "\n");
                 return null;
             }
 
@@ -179,11 +172,96 @@ namespace TinyCompiler
                 Errors.Error_List.Add("Expected to find " +
                     "Arthimatic Operator "+ "and " +
                     TokenStream[tokenIndex].token_type + "Found ");
+                return null;
             }
 
             return Aop;
         }
-        
+        Node Equation()
+        {
+            // Equation -> Term Eq` | ( Term Eq`) Term_
+            Node eq = new Node("Equation");
+            //Node temp;
+            //int indexTemp = tokenIndex;
+            if (check(Token_Class.LParanthesis))
+            {
+                eq.children.Add(match(Token_Class.LParanthesis));
+                eq.children.Add(Term());
+                eq.children.Add(Equation_());
+                eq.children.Add(match(Token_Class.RParanthesis));
+                return eq;
+            }
+            eq.children.Add(Term());
+            eq.children.Add(Equation_());
+            return eq;
+            //temp = Term();
+            //if (temp == null)
+            //{
+            //    tokenIndex = indexTemp;
+            //    return null;
+            //}
+            //else
+            //{
+            //    eq.children.Add(temp);
+            //}
+            //indexTemp = tokenIndex;
+            //temp = Equation_();
+            //if (temp == null)
+            //{
+            //    tokenIndex = indexTemp;
+            //    return null;
+            //}
+            //else
+            //{
+            //    eq.children.Add(temp);
+            //}
+
+
+
+
+        }
+
+        private Node Equation_()
+        {
+            //Equation_ -> Aop Factor Term_
+            Node eq = new Node("Equation_");
+
+            eq.children.Add(ArithamaticOperator());
+            eq.children.Add(Factor());
+            eq.children.Add(Term_());
+
+            return eq;
+        }
+
+        private Node Term_()
+        {
+            Node term = new Node("Term_");
+            Node temp;
+            int indexTemp = tokenIndex;
+            temp = ArithamaticOperator();
+            if (temp == null)
+            {
+                tokenIndex = indexTemp;
+            }
+            else
+            {
+                term.children.Add(ArithamaticOperator());
+                term.children.Add(Term());
+                term.children.Add(Term_());
+            }
+            
+
+            return term;
+        }
+
+        private Node Factor()
+        {
+            Node factor = new Node("Factor");
+
+
+
+            return factor;
+        }
     }
 
 }
