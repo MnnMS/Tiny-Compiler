@@ -79,6 +79,7 @@ namespace TinyCompiler
             Errors.Error_List.Clear();
             tokenTable.Rows.Clear();
             Tiny_Compiler.TokenStream.Clear();
+            treeView1.Nodes.Clear();
         }
 
         private void Form1_Load(object sender, EventArgs e)
