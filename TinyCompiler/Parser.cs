@@ -98,7 +98,7 @@ namespace TinyCompiler
             Temp = FunctionStatement();
             if (Temp != null)
             {
-                Functions.children.Add(FunctionStatement());
+                Functions.children.Add(Temp);
                 Functions.children.Add(FunctionStatementDash());
                 return Functions;
             }
@@ -123,8 +123,7 @@ namespace TinyCompiler
             Temp = FunctionStatement();
             if (Temp != null)
             {
-                tokenIndex = tempIndex;
-                FunDash.children.Add(FunctionStatement());
+                FunDash.children.Add(Temp);
                 FunDash.children.Add(FunctionStatementDash());
                 return FunDash;
             }
@@ -149,17 +148,10 @@ namespace TinyCompiler
             //FunctionDecleration -> FunctionName ( Parameter )
             Node FunDec = new Node("FunctionDecleration");
 
-            if (check(Token_Class.Identifier))
-            {
                 FunDec.children.Add(match(Token_Class.Identifier));
                 FunDec.children.Add(Parameter());
 
                 return FunDec;
-            }
-            else
-            {
-                return null;
-            }
            
         }
 
@@ -167,36 +159,24 @@ namespace TinyCompiler
         {
             // FunctionBody -> { Statments RetunStatment }
             Node FunBody = new Node("FunctionBody");
-            if (check(Token_Class.LBraces))
-            {
+
                 FunBody.children.Add(match(Token_Class.LBraces));
                 FunBody.children.Add(Statements());
                 FunBody.children.Add(ReturnStatements());
                 FunBody.children.Add(match(Token_Class.RBraces));
 
                 return FunBody;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         private Node ReturnStatements()
         {
             //ReturnStatement -> return Expression ; 
             Node Rs = new Node("ReturnStatement");
-            if (check(Token_Class.Return))
-            {
+
                 Rs.children.Add(match(Token_Class.Return));
                 Rs.children.Add(Expression());
                 Rs.children.Add(match(Token_Class.Semicolon));
                 return Rs;
-            }
-            else
-            {
-                return null;
-            }
         }
         private Node Statements()
         {
@@ -295,19 +275,12 @@ namespace TinyCompiler
             // RepeatStatements -> repeat Statements Until ConditionStatement
             Node Repeat = new Node("RepeatStatment");
 
-            if (check(Token_Class.Repeat))
-            {
                 Repeat.children.Add(match(Token_Class.Repeat));
                 Repeat.children.Add(Statements());
                 Repeat.children.Add(match(Token_Class.Until));
                 Repeat.children.Add(ConditionStatement());
 
                 return Repeat;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         private Node ConditionStatement()
@@ -330,8 +303,7 @@ namespace TinyCompiler
 
             if (temp != null)
             {
-                tokenIndex = tempindex;
-                MC.children.Add(BoolOP());
+                MC.children.Add(temp);
                 MC.children.Add(Condition());
                 MC.children.Add(MoreConditions());
 
@@ -366,18 +338,11 @@ namespace TinyCompiler
             //Condition -> Identifier CondiotionOP Term
             Node Cond = new Node("Condition");
 
-            if (check(Token_Class.Identifier))
-            {
                 Cond.children.Add(match(Token_Class.Identifier));
                 Cond.children.Add(CondiotionOP());
                 Cond.children.Add(Term());
 
                 return Cond;
-            }
-            else
-            {
-                return null;
-            }
             
         }
 
@@ -412,8 +377,6 @@ namespace TinyCompiler
             //if_Statement -> if CondationStatement then Statements ElseClause
             Node ifStat = new Node("if_Statement");
 
-            if (check(Token_Class.If))
-            {
                 ifStat.children.Add(match(Token_Class.If));
                 ifStat.children.Add(ConditionStatement());
                 ifStat.children.Add(match(Token_Class.Then));
@@ -421,11 +384,6 @@ namespace TinyCompiler
                 ifStat.children.Add(ElseClause());
 
                 return ifStat;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         private Node ElseClause()
@@ -437,8 +395,7 @@ namespace TinyCompiler
 
             if (temp != null)
             {
-                tokenIndex = tempindex;
-                ElseC.children.Add(ElseStatements());
+                ElseC.children.Add(temp);
                 ElseC.children.Add(match(Token_Class.End));
             }
             else
@@ -460,16 +417,14 @@ namespace TinyCompiler
 
             if(temp != null)
             {
-                tokenIndex = tempindex;
-                ES.children.Add(ElseIf());
+                ES.children.Add(temp);
             }
             else
             {
                 temp = Else();
                 if (temp != null)
                 {
-                    tokenIndex = tempindex;
-                    ES.children.Add(Else());
+                    ES.children.Add(temp);
                 }
                 else
                 {
@@ -485,17 +440,10 @@ namespace TinyCompiler
             //Else -> else Statments end
             Node e = new Node("ElseStatement");
 
-            if (check(Token_Class.Else))
-            {
                 e.children.Add(match(Token_Class.Else));
                 e.children.Add(Statements());
                 e.children.Add(match(Token_Class.End));
-            }
-            else
-            {
-                return null;
-            }
-
+ 
             return e;
         }
 
@@ -504,18 +452,11 @@ namespace TinyCompiler
             //ElseIf -> elseif ConditionStatement then Statements ElseClause
             Node ei = new Node("ElseIfStatement");
 
-            if (check(Token_Class.ElseIf))
-            {
                 ei.children.Add(match(Token_Class.ElseIf));
                 ei.children.Add(ConditionStatement());
                 ei.children.Add(match(Token_Class.Then));
                 ei.children.Add(Statements());
                 ei.children.Add(ElseClause());
-            }
-            else
-            {
-                return null;
-            }
 
             return ei;
         }
