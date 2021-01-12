@@ -1,9 +1,11 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -90,10 +92,24 @@ namespace TinyCompiler
             //Functions -> FunctionStatement FunctionStatementDash | FunctionStatementDash
             Node Functions = new Node("Functions");
 
-            Functions.children.Add(FunctionStatement());
-            Functions.children.Add(FunctionStatementDash());
+            int tempIndex = tokenIndex;
+            Node Temp;
 
-            return Functions;
+            Temp = FunctionStatement();
+            if (Temp != null)
+            {
+                Functions.children.Add(FunctionStatement());
+                Functions.children.Add(FunctionStatementDash());
+                return Functions;
+            }
+            else
+            {
+                tokenIndex = tempIndex;
+                Functions.children.Add(FunctionStatementDash());
+                return Functions;
+            }
+
+            return null;
 
         }
 
@@ -101,11 +117,19 @@ namespace TinyCompiler
         {
             //FunctionStatmentDash -> FunctionStatment FunctionStatmentDash | E
             Node FunDash = new Node("FunctionStatementDash");
+            int tempIndex = tokenIndex;
+            Node Temp;
 
-            FunDash.children.Add(FunctionStatement());
-            FunDash.children.Add(FunctionStatementDash());
-
-            return FunDash;
+            Temp = FunctionStatement();
+            if (Temp != null)
+            {
+                tokenIndex = tempIndex;
+                FunDash.children.Add(FunctionStatement());
+                FunDash.children.Add(FunctionStatementDash());
+                return FunDash;
+            }
+            return null;
+            
         }
 
         private Node FunctionStatement()
@@ -125,10 +149,18 @@ namespace TinyCompiler
             //FunctionDecleration -> FunctionName ( Parameter )
             Node FunDec = new Node("FunctionDecleration");
 
-            FunDec.children.Add(FunctionName());
-            FunDec.children.Add(Parameter());
+            if (check(Token_Class.Identifier))
+            {
+                FunDec.children.Add(match(Token_Class.Identifier));
+                FunDec.children.Add(Parameter());
 
-            return FunDec;
+                return FunDec;
+            }
+            else
+            {
+                return null;
+            }
+           
         }
 
         private Node FunctionBody()
@@ -158,7 +190,7 @@ namespace TinyCompiler
             {
                 Rs.children.Add(match(Token_Class.Return));
                 Rs.children.Add(Expression());
-
+                Rs.children.Add(match(Token_Class.Semicolon));
                 return Rs;
             }
             else
@@ -200,11 +232,30 @@ namespace TinyCompiler
         {
             //Statement -> Comment | Assignment | Decleration | WriteStatement | ReadStatement | ReturnStatement | if_Statement | RepeatStatement | E
             Node Statment = new Node("Statement");
+            int tempIndex = tokenIndex;
+            Node TempRet = ReturnStatements();
+            Node Tempif = if_Statement();
+            Node TempRep = RepeatStatement();
 
-            //if(check(Token_Class.Return))
-            Statment.children.Add(ReturnStatements());
-            Statment.children.Add(if_Statement());
-            Statment.children.Add(RepeatStatement());
+            if (TempRet != null)
+            {
+                tokenIndex = tempIndex;
+                Statment.children.Add(ReturnStatements());
+            }
+            else if (Tempif != null)
+            {
+                    tokenIndex = tempIndex;
+                    Statment.children.Add(if_Statement());
+            }
+            else if(TempRep!= null)
+            {
+                tokenIndex = tempIndex;
+                Statment.children.Add(RepeatStatement());
+            }
+            else
+            {
+                return null;
+            }
 
             return Statment;
             
@@ -246,11 +297,19 @@ namespace TinyCompiler
         {
             //MoreCondition -> BoolOP Condition MoreConditions | E
             Node MC = new Node("MoreConditions");
+            int tempindex = tokenIndex;
+            Node temp = BoolOP();
 
-            MC.children.Add(BoolOP());
-            MC.children.Add(Condition());
-            MC.children.Add(MoreConditions());
+            if (temp != null)
+            {
+                tokenIndex = tempindex;
+                MC.children.Add(BoolOP());
+                MC.children.Add(Condition());
+                MC.children.Add(MoreConditions());
 
+            }
+            else
+                return null;
             return MC;
         }
 
@@ -315,7 +374,8 @@ namespace TinyCompiler
             {
                 Co.children.Add(match(Token_Class.NotEqualOp));
             }
-
+            else
+                return null;
             return Co;
         }
 
@@ -344,9 +404,21 @@ namespace TinyCompiler
         {
             //ElseClause -> ElseStatements End | End
             Node ElseC = new Node("ElseClause");
+            int tempindex = tokenIndex;
+            Node temp = ElseStatements();
 
-            ElseC.children.Add(ElseStatements());
-            ElseC.children.Add(match(Token_Class.End));
+            if (temp != null)
+            {
+                tokenIndex = tempindex;
+                ElseC.children.Add(ElseStatements());
+                ElseC.children.Add(match(Token_Class.End));
+            }
+            else
+            {
+                tokenIndex = tempindex;
+                ElseC.children.Add(match(Token_Class.End));
+            }
+            
 
             return ElseC;
         }
@@ -355,24 +427,69 @@ namespace TinyCompiler
         {
             //ElseStatements -> elseif_Statement | else_Statement
             Node ES = new Node("ElseStatements");
+            int tempindex = tokenIndex;
+            Node temp = ElseIf();
 
-            ES.children.Add(ElseIf());
-            ES.children.Add(Else());
+            if(temp != null)
+            {
+                tokenIndex = tempindex;
+                ES.children.Add(ElseIf());
+            }
+            else
+            {
+                temp = Else();
+                if (temp != null)
+                {
+                    tokenIndex = tempindex;
+                    ES.children.Add(Else());
+                }
+                else
+                {
+                    return null;
+                }
+            }
 
             return ES;
         }
 
         private Node Else()
         {
-            throw new NotImplementedException();
+            //Else -> else Statments end
+            Node e = new Node("ElseStatement");
+
+            if (check(Token_Class.Else))
+            {
+                e.children.Add(match(Token_Class.Else));
+                e.children.Add(Statements());
+                e.children.Add(match(Token_Class.End));
+            }
+            else
+            {
+                return null;
+            }
+
+            return e;
         }
 
         private Node ElseIf()
         {
-            Node ei = new Node("ElseIF");
+            //ElseIf -> elseif ConditionStatement then Statements ElseClause
+            Node ei = new Node("ElseIfStatement");
 
-            if(check(Token_Class.ElseIf))
-            ei.children.Add()
+            if (check(Token_Class.ElseIf))
+            {
+                ei.children.Add(match(Token_Class.ElseIf));
+                ei.children.Add(ConditionStatement());
+                ei.children.Add(match(Token_Class.Then));
+                ei.children.Add(Statements());
+                ei.children.Add(ElseClause());
+            }
+            else
+            {
+                return null;
+            }
+
+            return ei;
         }
 
         Node FunctionCall()
